@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="IoU-PD uses a frozen teacher with box-marked privileged input to improve coordinate-generating visual grounding without changing inference."
+    />
+    <meta
+      name="keywords"
+      content="IoU-PD, visual grounding, privileged distillation, multimodal large language models, coordinate generation"
+    />
+    <meta name="theme-color" content="#0b3158" />
+    <link rel="canonical" href="https://xyzzzh.github.io/IoU-PD/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://xyzzzh.github.io/IoU-PD/" />
+    <meta property="og:title" content="IoU-PD | IoU-Aware Privileged Distillation" />
+    <meta
+      property="og:description"
+      content="Training-time privileged visual guidance for coordinate-generating visual grounding, with the standard student-only interface at inference."
+    />
+    <meta property="og:image" content="https://xyzzzh.github.io/IoU-PD/assets/framework.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="IoU-PD | IoU-Aware Privileged Distillation" />
+    <meta
+      name="twitter:description"
+      content="Training-time privileged visual guidance for coordinate-generating visual grounding, with the standard student-only interface at inference."
+    />
+    <meta name="twitter:image" content="https://xyzzzh.github.io/IoU-PD/assets/framework.png" />
+    <title>IoU-PD | IoU-Aware Privileged Distillation for Visual Grounding</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" data-header>
+      <div class="nav-shell">
+        <a class="brand" href="#top" aria-label="IoU-PD home">
+          IoU-PD: IoU-Aware Privileged Distillation for Visual Grounding with Multimodal Large Language Models
+        </a>
+
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="sr-only">Toggle navigation</span>
+          <span></span><span></span><span></span>
+        </button>
+
+        <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+          <a href="#abstract">Abstract</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
+          <a href="#analysis">Analysis</a>
+          <a href="#citation">Citation</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-orb hero-orb-one" aria-hidden="true"></div>
+        <div class="hero-orb hero-orb-two" aria-hidden="true"></div>
+
+        <div class="container hero-content">
+          <h1>
+            <span class="title-accent">IoU-PD:</span>
+            IoU-Aware Privileged Distillation for Visual Grounding with Multimodal Large Language Models
+          </h1>
+
+          <p class="hero-lead">
+            Ground-truth boxes guide a privileged teacher during training, while the deployed student keeps the
+            standard image-and-text grounding interface.
+          </p>
+
+          <div class="authors" aria-label="Authors">
+            <span>Xiuyuan Zhu<sup>1,2</sup></span>
+            <span>Ke Lu<sup>1,3</sup></span>
+            <span>Hao Wu<sup>1,2</sup></span>
+            <span>Siwen Jiao<sup>4</sup></span>
+            <span>Zijin Du<sup>1</sup></span>
+            <span>Dongming Zhang<sup>2</sup></span>
+            <span>Jian Xue<sup>1,*</sup></span>
+          </div>
+
+          <div class="affiliations">
+            <p><sup>1</sup> University of Chinese Academy of Sciences</p>
+            <p><sup>2</sup> State Key Laboratory of Communication Content Cognition</p>
+            <p><sup>3</sup> Peng Cheng Laboratory</p>
+            <p><sup>4</sup> National University of Singapore</p>
+          </div>
+
+          <div class="hero-actions" aria-label="Project links">
+            <a class="button button-primary" href="https://arxiv.org/abs/2607.15732" target="_blank" rel="noopener">
+              <span class="button-icon" aria-hidden="true">A</span>
+              arXiv
+            </a>
+            <a class="button button-secondary" href="https://arxiv.org/pdf/2607.15732" target="_blank" rel="noopener">
+              <span class="button-icon" aria-hidden="true">↓</span>
+              Paper PDF
+            </a>
+            <a class="button button-secondary" href="https://modelscope.cn/models/xyzzzh/IoU-PD" target="_blank" rel="noopener">
+              <span class="button-icon model-icon" aria-hidden="true">M</span>
+              Model
+            </a>
+            <a class="button button-quiet" href="#citation">
+              <span class="button-icon" aria-hidden="true">“</span>
+              BibTeX
+            </a>
+            <a class="button button-contact" href="#contact">
+              <span class="button-icon" aria-hidden="true">@</span>
+              Contact
+            </a>
+          </div>
+
+          <div class="privileged-stage" aria-label="IoU-PD training and inference overview">
+            <div class="privileged-stage-header">
+              <div>
+                <span class="stage-kicker">Privileged information is used only during training</span>
+                <strong>One student, two training views</strong>
+              </div>
+              <span class="stage-badge">Student-only inference</span>
+            </div>
+
+            <div class="branch-grid">
+              <article class="training-branch student-branch">
+                <span class="branch-role">Student</span>
+                <strong>Original input</strong>
+                <p>Image + referring expression</p>
+              </article>
+              <div class="branch-connector" aria-hidden="true">+</div>
+              <article class="training-branch teacher-branch">
+                <span class="branch-role">Frozen teacher</span>
+                <strong>Privileged input</strong>
+                <p>Box-marked image + location hint</p>
+              </article>
+            </div>
+
+            <div class="objective-row" aria-label="Training objectives">
+              <span>SFT anchor</span>
+              <span>Privileged KL distillation</span>
+              <span>IoU-aware token weights</span>
+            </div>
+
+            <div class="inference-strip">
+              <span>Inference</span>
+              <strong>Original image + prompt → student → bounding box</strong>
+              <small>No box overlay, teacher branch, or additional prediction module</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section abstract-section" id="abstract">
+        <div class="container narrow">
+          <div class="section-heading centered">
+            <span class="section-index">01</span>
+            <h2>Abstract</h2>
+          </div>
+          <p class="abstract-copy">
+            Visual grounding with multimodal large language models is commonly formulated as autoregressive
+            coordinate generation, where a model outputs bounding-box coordinates as text given an image and a
+            referring-expression prompt. While this interface is simple and compatible with instruction following,
+            it introduces a mismatch between training and evaluation: training optimizes token-level likelihood over
+            coordinate strings, whereas grounding quality is measured by geometric overlap. We propose IoU-PD, an
+            IoU-aware privileged distillation method for coordinate-generating multimodal large language models.
+            IoU-PD uses ground-truth boxes not only as coordinate targets, but also as privileged training-time
+            guidance. During training, the student receives the original image and prompt, while a frozen teacher
+            receives a box-marked image and an augmented prompt that indicates the marked region. The student is
+            trained with a supervised fine-tuning anchor and a privileged distillation loss whose token weights
+            reflect both geometric importance and teacher reliability. At inference time, IoU-PD requires no box
+            overlay, privileged hint, teacher branch, or additional prediction module. Experiments on standard
+            referring-expression grounding benchmarks show consistent region-level improvements over strong
+            coordinate-generating baselines, demonstrating that ground-truth boxes can provide useful privileged
+            guidance beyond serving as coordinate labels.
+          </p>
+        </div>
+      </section>
+
+      <section class="section problem-section" id="motivation">
+        <div class="container">
+          <div class="section-heading split-heading">
+            <div>
+              <span class="section-index">02</span>
+              <h2>Training should reflect geometry</h2>
+            </div>
+            <p>
+              Coordinate generation is trained as next-token prediction, but evaluated by the overlap between two
+              regions. IoU-PD introduces geometric information into training while preserving the generative format.
+            </p>
+          </div>
+
+          <div class="comparison-grid supervision-comparison">
+            <article class="comparison-card flat-card">
+              <div class="card-topline">
+                <span class="card-tag">Coordinate SFT</span>
+                <span class="type-count">label only</span>
+              </div>
+              <div class="supervision-flow" aria-label="Standard coordinate supervision">
+                <span class="flow-node">Image + query</span>
+                <span class="flow-symbol" aria-hidden="true">→</span>
+                <span class="flow-node target-node">Coordinate string</span>
+              </div>
+              <p>
+                The ground-truth box supplies the output tokens. Token likelihood does not directly describe the
+                geometric quality of the predicted region.
+              </p>
+            </article>
+
+            <article class="comparison-card hi-card">
+              <div class="card-topline">
+                <span class="card-tag">IoU-PD</span>
+                <span class="type-count">label + privileged guidance</span>
+              </div>
+              <div class="signal-stack" aria-label="IoU-PD supervision signals">
+                <span class="flow-node">Coordinate target</span>
+                <span class="flow-node privileged-node">Box-marked teacher view</span>
+                <span class="flow-node weighted-node">Geometry-aware token weights</span>
+              </div>
+              <p>
+                The same box also guides a frozen teacher. Distillation then transfers this training-only information
+                to the student according to geometric importance and teacher reliability.
+              </p>
+            </article>
+          </div>
+
+          <div class="feature-row" aria-label="Key properties">
+            <article class="feature-item">
+              <span class="feature-number">1</span>
+              <div><strong>Privileged training view</strong><span>The teacher sees a box-marked image and a short hint.</span></div>
+            </article>
+            <article class="feature-item">
+              <span class="feature-number">0</span>
+              <div><strong>Extra inference modules</strong><span>Deployment uses the original student input and output.</span></div>
+            </article>
+            <article class="feature-item">
+              <span class="feature-number">5</span>
+              <div><strong>Held-out evaluation splits</strong><span>RefCOCO, RefCOCOg, and RefCOCO+ benchmarks.</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section method-section" id="method">
+        <div class="container">
+          <div class="section-heading split-heading light-heading">
+            <div>
+              <span class="section-index">03</span>
+              <h2>IoU-aware privileged distillation</h2>
+            </div>
+            <p>
+              IoU-PD combines direct coordinate supervision with a frozen privileged teacher and token-level
+              weighting that connects distillation to region quality.
+            </p>
+          </div>
+
+          <div class="method-notes">
+            <article>
+              <span class="note-index">A</span>
+              <h3>Privileged teacher</h3>
+              <p>The teacher receives a bounding-box overlay and a short hint while the student receives the original input.</p>
+            </article>
+            <article>
+              <span class="note-index">B</span>
+              <h3>SFT anchor</h3>
+              <p>Supervised coordinate generation maintains the output format and anchors the grounding distribution.</p>
+            </article>
+            <article>
+              <span class="note-index">C</span>
+              <h3>IoU-aware weighting</h3>
+              <p>Sample quality, coordinate error, digit significance, agreement, and confidence determine token weights.</p>
+            </article>
+          </div>
+
+          <figure class="paper-figure framework-figure">
+            <img
+              src="assets/framework.png"
+              alt="IoU-PD framework with an original-input student, a frozen box-marked teacher, supervised fine-tuning, and IoU-aware privileged distillation"
+              loading="lazy"
+            />
+            <figcaption>
+              The student learns from the original input. A frozen teacher receives privileged box guidance during
+              training. Only the student is retained for inference.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section results-section" id="results">
+        <div class="container">
+          <div class="section-heading split-heading">
+            <div>
+              <span class="section-index">04</span>
+              <h2>Consistent region-level gains</h2>
+            </div>
+            <p>
+              Under the matched Qwen3-VL-4B setting, IoU-PD improves the pooled result and every held-out split across
+              mIoU, Acc@0.5, and Acc@0.7.
+            </p>
+          </div>
+
+          <div class="result-summary" aria-label="Main results summary">
+            <article><span>OVERALL</span><strong>+4.03</strong><small>mIoU points</small></article>
+            <article><span>OVERALL</span><strong>+2.98</strong><small>Acc@0.5 points</small></article>
+            <article><span>OVERALL</span><strong>+4.25</strong><small>Acc@0.7 points</small></article>
+            <article><span>COVERAGE</span><strong>5 / 5</strong><small>splits improved on all three metrics</small></article>
+          </div>
+
+          <div class="results-layout">
+            <div class="result-table-wrap">
+              <div class="table-title">
+                <span>Matched 4B comparison</span>
+                <strong>Base → IoU-PD</strong>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Evaluation split</th>
+                      <th colspan="2">mIoU</th>
+                      <th colspan="2">Acc@0.5</th>
+                      <th colspan="2">Acc@0.7</th>
+                    </tr>
+                    <tr>
+                      <th>Base</th><th>IoU-PD</th>
+                      <th>Base</th><th>IoU-PD</th>
+                      <th>Base</th><th>IoU-PD</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="ours-row"><td>Overall</td><td>81.74</td><td>85.78</td><td>88.58</td><td>91.56</td><td>82.51</td><td>86.76</td></tr>
+                    <tr><td>RefCOCO testA</td><td>85.90</td><td class="best-alt">88.45</td><td>93.25</td><td class="best-alt">95.19</td><td>88.56</td><td class="best-alt">91.44</td></tr>
+                    <tr><td>RefCOCO testB</td><td>81.45</td><td class="best-alt">84.20</td><td>88.85</td><td class="best-alt">90.95</td><td>81.33</td><td class="best-alt">84.14</td></tr>
+                    <tr><td>RefCOCOg test</td><td>81.85</td><td class="best-alt">87.23</td><td>88.31</td><td class="best-alt">91.45</td><td>82.18</td><td class="best-alt">87.34</td></tr>
+                    <tr><td>RefCOCO+ testA</td><td>83.79</td><td class="best-alt">87.14</td><td>90.85</td><td class="best-alt">93.59</td><td>85.98</td><td class="best-alt">89.91</td></tr>
+                    <tr><td>RefCOCO+ testB</td><td>74.64</td><td class="best-alt">79.88</td><td>80.73</td><td class="best-alt">85.80</td><td>73.33</td><td class="best-alt">79.28</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-note">
+                Values are percentages. Overall results pool all examples from the five held-out splits.
+              </p>
+            </div>
+
+            <figure class="paper-figure results-figure scaling-figure">
+              <img
+                src="assets/scaling.png"
+                alt="Scaling ablations across data sizes, epoch budgets, and final model settings"
+                loading="lazy"
+              />
+              <figcaption>
+                The improvement remains visible with reduced data and model size, and increases with additional
+                grounding data and a sufficient training budget.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section analysis-section" id="analysis">
+        <div class="container">
+          <div class="section-heading split-heading light-heading">
+            <div>
+              <span class="section-index">05</span>
+              <h2>Where the gains come from</h2>
+            </div>
+            <p>
+              Component, threshold, and object-size analyses show that the improvement is distributed across the
+              evaluated conditions rather than confined to one metric or subset.
+            </p>
+          </div>
+
+          <div class="analysis-figure-grid">
+            <figure class="paper-figure analysis-card">
+              <img
+                src="assets/component_ablations.png"
+                alt="Component ablations for supervised fine-tuning, teacher distillation, privileged box input, and IoU-aware weighting"
+                loading="lazy"
+              />
+              <figcaption>
+                SFT provides the main anchor. The privileged box teacher and IoU-aware weighting add further gains.
+              </figcaption>
+            </figure>
+            <figure class="paper-figure analysis-card">
+              <img
+                src="assets/iou_threshold_distribution.png"
+                alt="Grounding precision across IoU thresholds and the predicted IoU distribution"
+                loading="lazy"
+              />
+              <figcaption>
+                IoU-PD improves performance from P@0.5 through P@0.95 and shifts predictions toward higher overlap.
+              </figcaption>
+            </figure>
+            <figure class="paper-figure analysis-card object-size-card">
+              <img
+                src="assets/object_size.png"
+                alt="Base and IoU-PD precision for small, medium, and large target objects"
+                loading="lazy"
+              />
+              <figcaption>
+                Both P@0.5 and P@0.7 improve for small, medium, and large objects.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section guidance-section" id="guidance">
+        <div class="container">
+          <div class="section-heading split-heading">
+            <div>
+              <span class="section-index">06</span>
+              <h2>Inside the training signal</h2>
+            </div>
+            <p>
+              The visual hint preserves the scene while identifying the target. The token-weighting rule then
+              allocates the distillation signal according to geometry and confidence.
+            </p>
+          </div>
+
+          <div class="guidance-grid">
+            <figure class="paper-figure guidance-card">
+              <img
+                src="assets/hint_comparison.png"
+                alt="Comparison of bounding-box, Gaussian blur, reverse-shadow, and grayscale privileged visual hints"
+                loading="lazy"
+              />
+              <figcaption>
+                A bounding-box overlay marks the target while retaining the scene context needed by the referring expression.
+              </figcaption>
+            </figure>
+            <figure class="paper-figure guidance-card">
+              <img
+                src="assets/token_weighting.png"
+                alt="Token weights for coordinate digits based on coordinate error, digit significance, teacher agreement, and confidence"
+                loading="lazy"
+              />
+              <figcaption>
+                Token weights vary across coordinates and digit positions, concentrating distillation where it is most useful.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section citation-section" id="citation">
+        <div class="container narrow">
+          <div class="section-heading centered">
+            <span class="section-index">07</span>
+            <h2>Citation</h2>
+            <p>If this work supports your research, please cite the paper.</p>
+          </div>
+          <div class="citation-box">
+            <button class="copy-button" type="button" data-copy-button>
+              <span aria-hidden="true">⧉</span><span data-copy-label>Copy BibTeX</span>
+            </button>
+            <pre id="bibtex"><code>@article{zhu2026ioupd,
+  title   = {IoU-PD: IoU-Aware Privileged Distillation for Visual Grounding with Multimodal Large Language Models},
+  author  = {Zhu, Xiuyuan and Lu, Ke and Wu, Hao and Jiao, Siwen and Du, Zijin and Zhang, Dongming and Xue, Jian},
+  journal = {arXiv preprint arXiv:2607.15732},
+  year    = {2026}
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section contact-section" id="contact">
+        <div class="container narrow">
+          <div class="section-heading centered">
+            <span class="section-index">08</span>
+            <h2>Contact</h2>
+            <p>For questions about the paper, code, or model, please contact us by email.</p>
+          </div>
+          <div class="contact-address">
+            <span class="contact-address-icon" aria-hidden="true">@</span>
+            <span class="contact-address-copy">
+              <small>Email</small>
+              <strong>zhuxiuyuan22@mails.ucas.edu.cn</strong>
+            </span>
+            <button
+              class="contact-copy-button"
+              type="button"
+              data-copy-contact
+              data-email="zhuxiuyuan22@mails.ucas.edu.cn"
+              aria-label="Copy contact email address"
+            >
+              <span aria-hidden="true">⧉</span><span data-contact-copy-label>Copy</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <strong>IoU-PD</strong>
+          <p>IoU-Aware Privileged Distillation for Visual Grounding</p>
+        </div>
+        <div class="footer-links">
+          <a href="https://arxiv.org/abs/2607.15732" target="_blank" rel="noopener">Paper</a>
+          <a href="https://modelscope.cn/models/xyzzzh/IoU-PD" target="_blank" rel="noopener">Model</a>
+          <a href="#citation">BibTeX</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
