@@ -39,10 +39,24 @@ modelPickers.forEach((picker) => {
   const dropdown = picker.querySelector(".model-dropdown");
   if (!toggle || !dropdown) return;
 
+  const positionDropdown = () => {
+    dropdown.style.transform = "";
+    const bounds = dropdown.getBoundingClientRect();
+    const offset = bounds.left < 12
+      ? 12 - bounds.left
+      : Math.min(0, document.documentElement.clientWidth - 12 - bounds.right);
+    if (offset) dropdown.style.transform = `translateX(${offset}px)`;
+  };
+
   const setOpen = (isOpen) => {
     toggle.setAttribute("aria-expanded", String(isOpen));
     dropdown.hidden = !isOpen;
+    if (isOpen) positionDropdown();
   };
+
+  window.addEventListener("resize", () => {
+    if (!dropdown.hidden) positionDropdown();
+  });
 
   toggle.addEventListener("click", () => {
     setOpen(toggle.getAttribute("aria-expanded") !== "true");
