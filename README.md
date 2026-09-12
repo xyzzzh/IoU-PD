@@ -7,7 +7,8 @@ Static project page for **IoU-PD: IoU-Aware Privileged Distillation for Visual G
 - Project page: https://xyzzzh.github.io/IoU-PD/
 - arXiv: https://arxiv.org/abs/2607.15732
 - PDF: https://arxiv.org/pdf/2607.15732
-- Model: https://modelscope.cn/models/xyzzzh/IoU-PD
+- Model (Hugging Face): https://huggingface.co/xyzzzh/IoU-PD
+- ModelScope: https://modelscope.cn/models/xyzzzh/IoU-PD
 
 ## Local preview
 

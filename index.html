@@ -106,10 +106,25 @@
               <span class="button-icon" aria-hidden="true">↓</span>
               Paper PDF
             </a>
-            <a class="button button-secondary" href="https://modelscope.cn/models/xyzzzh/IoU-PD" target="_blank" rel="noopener">
-              <span class="button-icon model-icon" aria-hidden="true">M</span>
-              Model
-            </a>
+            <div class="model-picker" data-model-picker>
+              <a class="button button-secondary model-primary" href="https://huggingface.co/xyzzzh/IoU-PD" target="_blank" rel="noopener" aria-label="Model on Hugging Face">
+                <span class="button-icon model-icon" aria-hidden="true">M</span>
+                Model
+              </a>
+              <button class="model-toggle" type="button" aria-expanded="false" aria-controls="model-providers" aria-label="Choose model platform">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <div class="model-dropdown" id="model-providers" hidden>
+                <a href="https://huggingface.co/xyzzzh/IoU-PD" target="_blank" rel="noopener">
+                  <span>Hugging Face</span><small>Default</small>
+                </a>
+                <a href="https://modelscope.cn/models/xyzzzh/IoU-PD" target="_blank" rel="noopener">
+                  <span>ModelScope</span><span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
             <a class="button button-quiet" href="#citation">
               <span class="button-icon" aria-hidden="true">“</span>
               BibTeX
@@ -506,7 +521,7 @@
         </div>
         <div class="footer-links">
           <a href="https://arxiv.org/abs/2607.15732" target="_blank" rel="noopener">Paper</a>
-          <a href="https://modelscope.cn/models/xyzzzh/IoU-PD" target="_blank" rel="noopener">Model</a>
+          <a href="https://huggingface.co/xyzzzh/IoU-PD" target="_blank" rel="noopener">Model</a>
           <a href="#citation">BibTeX</a>
           <a href="#contact">Contact</a>
         </div>

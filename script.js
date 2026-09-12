@@ -32,6 +32,49 @@ window.addEventListener("resize", () => {
 });
 updateHeader();
 
+const modelPickers = document.querySelectorAll("[data-model-picker]");
+
+modelPickers.forEach((picker) => {
+  const toggle = picker.querySelector(".model-toggle");
+  const dropdown = picker.querySelector(".model-dropdown");
+  if (!toggle || !dropdown) return;
+
+  const setOpen = (isOpen) => {
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    dropdown.hidden = !isOpen;
+  };
+
+  toggle.addEventListener("click", () => {
+    setOpen(toggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  toggle.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowDown") return;
+    event.preventDefault();
+    setOpen(true);
+    dropdown.querySelector("a")?.focus();
+  });
+
+  picker.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || dropdown.hidden) return;
+    event.preventDefault();
+    setOpen(false);
+    toggle.focus();
+  });
+
+  picker.addEventListener("focusout", (event) => {
+    if (!picker.contains(event.relatedTarget)) setOpen(false);
+  });
+
+  dropdown.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!picker.contains(event.target)) setOpen(false);
+  });
+});
+
 const copyButton = document.querySelector("[data-copy-button]");
 const copyLabel = document.querySelector("[data-copy-label]");
 const bibtex = document.querySelector("#bibtex code");
